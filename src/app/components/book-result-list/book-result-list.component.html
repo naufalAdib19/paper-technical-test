@@ -1,0 +1,20 @@
+<h2>{{ result().books.length }} of {{ result().total }} matches for "{{ query() }}"</h2>
+
+<ol>
+  @for (book of result().books; track book.id) {
+    <li>
+      <h3>{{ book.title }}</h3>
+      <p>{{ book.authors.length > 0 ? book.authors.join(', ') : 'Author unavailable' }}</p>
+      @if (book.firstPublishedYear !== null || book.editionCount !== null) {
+        <p>
+          @if (book.firstPublishedYear !== null) {
+            <span>First published {{ book.firstPublishedYear }}</span>
+          }
+          @if (book.editionCount !== null) {
+            <span>{{ book.editionCount }} editions</span>
+          }
+        </p>
+      }
+    </li>
+  }
+</ol>

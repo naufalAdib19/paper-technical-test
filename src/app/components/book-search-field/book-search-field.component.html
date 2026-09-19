@@ -1,0 +1,18 @@
+<div>
+  <label for="book-search">Search books</label>
+  <input
+    id="book-search"
+    type="search"
+    [formControl]="control()"
+    [attr.aria-describedby]="isBelowMinimum ? 'search-help' : null"
+    autocomplete="off"
+    placeholder="Try &quot;Octavia Butler&quot; or &quot;climate fiction&quot;"
+  />
+  @if (control().value.length > 0) {
+    <button type="button" (click)="cleared.emit()">Clear search</button>
+  }
+</div>
+
+@if (isBelowMinimum) {
+  <p id="search-help">Enter at least 2 characters.</p>
+}

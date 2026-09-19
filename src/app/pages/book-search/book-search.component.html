@@ -1,4 +1,47 @@
 <main>
-  <h1>Find the book you meant.</h1>
-  <p>Search millions of works by title, author, or subject.</p>
+  @let state = searchState();
+
+  <header>
+    <h1>Find the book you meant.</h1>
+    <p>Search millions of works by title, author, or subject.</p>
+    <app-book-search-field [control]="searchControl" (cleared)="clearSearch()" />
+  </header>
+
+  <p aria-live="polite">
+    @switch (state.status) {
+      @case ('loading') {
+        Searching for "{{ state.query }}"
+      }
+      @case ('success') {
+        {{ state.data.books.length }} matches loaded for "{{ state.query }}"
+      }
+      @case ('empty') {
+        No books found for "{{ state.query }}"
+      }
+      @case ('error') {
+        Books could not be loaded.
+      }
+    }
+  </p>
+
+  <section [attr.aria-busy]="state.status === 'loading'">
+    @switch (state.status) {
+      @case ('idle') {
+        <p>Results appear as you type.</p>
+      }
+      @case ('loading') {
+        <p>Searching the Open Library catalog.</p>
+      }
+      @case ('success') {
+        <app-book-result-list [result]="state.data" [query]="state.query" />
+      }
+      @case ('empty') {
+        <p>Check the spelling or try a title, author, or broader subject.</p>
+      }
+      @case ('error') {
+        <p>Check your connection, then try this search again.</p>
+        <button type="button" (click)="retrySearch()">Try again</button>
+      }
+    }
+  </section>
 </main>
