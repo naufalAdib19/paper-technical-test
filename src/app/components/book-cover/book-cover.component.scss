@@ -2,15 +2,28 @@
   display: block;
 }
 
-img,
-div {
+.book-cover__image,
+.book-cover__placeholder {
   aspect-ratio: 2 / 3;
   display: block;
   inline-size: 100%;
+  overflow: hidden;
+  border: 1px solid rgb(0 0 0 / 10%);
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5rem 1rem rgb(18 23 34 / 14%), 0 0.1rem 0.25rem rgb(18 23 34 / 10%);
 }
 
-div {
+.book-cover__image {
+  object-fit: cover;
+}
+
+.book-cover__placeholder {
   align-content: center;
-  background: #e8ecf2;
+  background: var(--color-surface-soft);
+  color: var(--color-text-secondary);
+  font-family: var(--font-meta);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
   text-align: center;
+  text-transform: uppercase;
 }

@@ -1,5 +1,6 @@
 @if (imageSrc() && !imageFailed()) {
   <img
+    class="book-cover__image"
     [src]="imageSrc()"
     [alt]="decorative() ? '' : 'Cover of ' + title()"
     [attr.loading]="priority() ? 'eager' : 'lazy'"
@@ -7,5 +8,5 @@
     (error)="onImageError()"
   />
 } @else {
-  <div aria-hidden="true">Cover unavailable</div>
+  <div class="book-cover__placeholder" aria-hidden="true">Cover unavailable</div>
 }

@@ -14,6 +14,7 @@ export class BookDetailComponent implements OnChanges {
   readonly state = input.required<DetailState>();
   readonly workUrl = input<string | null>(null);
   readonly resultCount = input(0);
+  readonly resultIndex = input<number | null>(null);
   readonly back = output<void>();
   readonly retry = output<void>();
   readonly allSubjectsVisible = signal(false);
@@ -43,5 +44,23 @@ export class BookDetailComponent implements OnChanges {
     return this.allSubjectsVisible()
       ? state.work.subjects
       : state.work.subjects.slice(0, 8);
+  }
+
+  formatIndex(index: number | null): string {
+    return index === null ? '--' : index.toString().padStart(2, '0');
+  }
+
+  get workId(): string | null {
+    const summary = this.summary();
+    if (summary !== null) {
+      return summary.id;
+    }
+
+    const state = this.state();
+    return state.status === 'success'
+      ? state.work.id
+      : state.status === 'idle'
+        ? null
+        : state.workId;
   }
 }

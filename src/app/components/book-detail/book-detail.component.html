@@ -2,62 +2,87 @@
 @let book = summary();
 
 <section aria-labelledby="book-detail-heading" [attr.aria-busy]="detailState.status === 'loading'">
-  <button class="mobile-back" type="button" (click)="back.emit()">
+  <button class="detail__back" type="button" (click)="back.emit()">
     Back to {{ resultCount() }} results
   </button>
 
-  @if (book) {
-    <app-book-cover [coverId]="book.coverId" size="M" [title]="book.title" [priority]="true" />
-    <h2 id="book-detail-heading" tabindex="-1">{{ book.title }}</h2>
-    <p>{{ book.authors.length > 0 ? book.authors.join(', ') : 'Author unavailable' }}</p>
-
-    @if (book.firstPublishedYear !== null) {
-      <p>First published {{ book.firstPublishedYear }}</p>
-    }
-    @if (book.languages.length > 0) {
-      <p>Languages: {{ book.languages.join(', ') }}</p>
-    }
-    @if (book.editionCount !== null) {
-      <p>{{ book.editionCount }} editions</p>
-    }
-  } @else {
-    <h2 id="book-detail-heading" tabindex="-1">Loading selected work</h2>
-  }
-
-  @if (detailState.status === 'loading') {
-    <p>Loading details for {{ book?.title ?? 'this work' }}.</p>
-  }
-
-  @if (detailState.status === 'success') {
-    <h3>Description</h3>
-    <p>{{ detailState.work.description ?? 'No description is available for this work.' }}</p>
-
-    @if (detailState.work.subjects.length > 0) {
-      <h3>Subjects</h3>
-      <ul id="book-subjects">
-        @for (subject of visibleSubjects; track subject) {
-          <li>{{ subject }}</li>
-        }
-      </ul>
-      @if (detailState.work.subjects.length > 8) {
-        <button
-          type="button"
-          aria-controls="book-subjects"
-          [attr.aria-expanded]="allSubjectsVisible()"
-          (click)="allSubjectsVisible.set(!allSubjectsVisible())"
-        >
-          {{ allSubjectsVisible() ? 'Show fewer subjects' : 'Show all subjects' }}
-        </button>
+  <div class="detail__record">
+    <div class="detail__rail" [attr.aria-label]="'Catalog record ' + (workId ?? 'loading')">
+      <span>{{ formatIndex(resultIndex()) }}</span>
+      @if (workId) {
+        <bdi>{{ workId }}</bdi>
       }
-    }
-  }
+    </div>
 
-  @if (detailState.status === 'error') {
-    <p>More details could not be loaded.</p>
-    <button type="button" (click)="retry.emit()">Try again</button>
-  }
+    <div class="detail__content">
+      @if (book) {
+        <div class="detail__header">
+          <app-book-cover class="detail__cover" [coverId]="book.coverId" size="M" [title]="book.title" [priority]="true" />
+          <div class="detail__intro">
+            <h2 id="book-detail-heading" tabindex="-1">{{ book.title }}</h2>
+            <p class="detail__author">{{ book.authors.length > 0 ? book.authors.join(', ') : 'Author unavailable' }}</p>
 
-  @if (workUrl()) {
-    <a [href]="workUrl()">View on Open Library</a>
-  }
+            <dl class="detail__metadata">
+              @if (book.firstPublishedYear !== null) {
+                <div><dt>First published</dt><dd>{{ book.firstPublishedYear }}</dd></div>
+              }
+              @if (book.languages.length > 0) {
+                <div><dt>Languages</dt><dd>{{ book.languages.join(', ') }}</dd></div>
+              }
+              @if (book.editionCount !== null) {
+                <div><dt>Editions</dt><dd>{{ book.editionCount }}</dd></div>
+              }
+            </dl>
+          </div>
+        </div>
+      } @else {
+        <h2 id="book-detail-heading" tabindex="-1">Loading selected work</h2>
+      }
+
+      @if (detailState.status === 'loading') {
+        <div class="detail__loading" aria-hidden="true"><span></span><span></span><span></span></div>
+        <p class="detail__loading-copy">Loading details for {{ book?.title ?? 'this work' }}.</p>
+      }
+
+      @if (detailState.status === 'success') {
+        <section class="detail__section" aria-labelledby="description-heading">
+          <h3 id="description-heading">Description</h3>
+          <p>{{ detailState.work.description ?? 'No description is available for this work.' }}</p>
+        </section>
+
+        @if (detailState.work.subjects.length > 0) {
+          <section class="detail__section" aria-labelledby="subjects-heading">
+            <h3 id="subjects-heading">Subject index</h3>
+            <ul id="book-subjects" class="detail__subjects">
+              @for (subject of visibleSubjects; track subject) {
+                <li>{{ subject }}</li>
+              }
+            </ul>
+            @if (detailState.work.subjects.length > 8) {
+              <button
+                class="detail__secondary-action"
+                type="button"
+                aria-controls="book-subjects"
+                [attr.aria-expanded]="allSubjectsVisible()"
+                (click)="allSubjectsVisible.set(!allSubjectsVisible())"
+              >
+                {{ allSubjectsVisible() ? 'Show fewer subjects' : 'Show all subjects' }}
+              </button>
+            }
+          </section>
+        }
+      }
+
+      @if (detailState.status === 'error') {
+        <div class="detail__error">
+          <p>More details could not be loaded.</p>
+          <button class="detail__secondary-action" type="button" (click)="retry.emit()">Try again</button>
+        </div>
+      }
+
+      @if (workUrl()) {
+        <a class="detail__external-link" [href]="workUrl()">View on Open Library</a>
+      }
+    </div>
+  </div>
 </section>

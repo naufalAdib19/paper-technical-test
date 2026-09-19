@@ -57,6 +57,16 @@ export class BookSearchComponent {
     const state = this.searchState();
     return state.status === 'success' ? state.data.books.length : 0;
   });
+  readonly selectedResultIndex = computed(() => {
+    const state = this.searchState();
+    const workId = this.selectedWorkId();
+    if (state.status !== 'success' || workId === null) {
+      return null;
+    }
+
+    const index = state.data.books.findIndex((book) => book.id === workId);
+    return index === -1 ? null : index + 1;
+  });
   readonly workUrl = computed(() => {
     const workId = this.selectedWorkId();
     return workId === null ? null : this.books.getWorkUrl(workId);

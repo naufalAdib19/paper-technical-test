@@ -1,15 +1,23 @@
-<main>
+<main class="catalog-page">
   @let state = searchState();
   @let detail = detailState();
   @let hasSelection = selectedWorkId() !== null;
 
-  <header>
-    <h1>Find the book you meant.</h1>
-    <p>Search millions of works by title, author, or subject.</p>
-    <app-book-search-field [control]="searchControl" (cleared)="clearSearch()" />
+  <header class="catalog-page__header">
+    <div class="catalog-page__masthead">
+      <a class="catalog-page__brand" href="/">Folio <span>Open catalog</span></a>
+      <a class="catalog-page__source" href="https://openlibrary.org">Data by Open Library</a>
+    </div>
+    <div class="catalog-page__hero">
+      <div class="catalog-page__hero-copy">
+        <h1>Find the book you meant.</h1>
+        <p>Search millions of works by title, author, or subject.</p>
+      </div>
+      <app-book-search-field [control]="searchControl" (cleared)="clearSearch()" />
+    </div>
   </header>
 
-  <p aria-live="polite">
+  <p class="sr-only" aria-live="polite">
     @switch (state.status) {
       @case ('loading') {
         Searching for "{{ state.query }}"
@@ -26,14 +34,19 @@
     }
   </p>
 
-  <div class="search-layout" [class.has-selection]="hasSelection">
+  <div class="catalog-page__content" [class.catalog-page__content--selected]="hasSelection">
     <section class="results-pane" [attr.aria-busy]="state.status === 'loading'">
     @switch (state.status) {
       @case ('idle') {
-        <p>Results appear as you type.</p>
+        <div class="state-panel state-panel--idle">
+          <p>Start with a title, author, or subject.</p>
+        </div>
       }
       @case ('loading') {
-        <p>Searching the Open Library catalog.</p>
+        <div class="state-panel state-panel--loading">
+          <p>Searching the Open Library catalog.</p>
+          <div class="state-panel__skeletons" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        </div>
       }
       @case ('success') {
         <app-book-result-list
@@ -44,11 +57,16 @@
         />
       }
       @case ('empty') {
-        <p>Check the spelling or try a title, author, or broader subject.</p>
+        <div class="state-panel state-panel--empty">
+          <p>No books found for "{{ state.query }}".</p>
+          <p>Check the spelling or try a title, author, or broader subject.</p>
+        </div>
       }
       @case ('error') {
-        <p>Check your connection, then try this search again.</p>
-        <button type="button" (click)="retrySearch()">Try again</button>
+        <div class="state-panel state-panel--error">
+          <p>Books could not be loaded. Check your connection, then try this search again.</p>
+          <button type="button" (click)="retrySearch()">Try again</button>
+        </div>
       }
     }
     </section>
@@ -60,10 +78,16 @@
           [state]="detail"
           [workUrl]="workUrl()"
           [resultCount]="resultCount()"
+          [resultIndex]="selectedResultIndex()"
           (back)="closeDetail()"
           (retry)="retryDetail()"
         />
       </aside>
     }
   </div>
+
+  <footer class="catalog-page__footer">
+    <span>Book data and covers provided by Open Library.</span>
+    <a href="https://openlibrary.org">Open Library</a>
+  </footer>
 </main>

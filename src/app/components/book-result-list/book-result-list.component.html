@@ -1,29 +1,37 @@
-<h2>{{ result().books.length }} of {{ result().total }} matches for "{{ query() }}"</h2>
+<h2 class="results-heading">{{ result().books.length }} of {{ result().total }} matches for "{{ query() }}"</h2>
 
-<ol>
+<ol class="result-list">
   @for (book of result().books; track book.id) {
-    <li>
+    <li class="result-list__item">
       <a
+        class="result-list__link"
         [id]="'book-result-' + book.id"
         [routerLink]="[]"
         [queryParams]="{ q: query(), book: book.id }"
         [attr.aria-current]="book.id === selectedWorkId() ? 'true' : null"
         (click)="selected.emit({ workId: book.id, event: $event })"
       >
-        <h3>{{ book.title }}</h3>
+        <span class="result-list__index" aria-hidden="true"></span>
+        <app-book-cover class="result-list__cover" [coverId]="book.coverId" size="S" [title]="book.title" [decorative]="true" />
+        <span class="result-list__primary">
+          <h3>{{ book.title }}</h3>
+          <span class="result-list__author">{{ book.authors.length > 0 ? book.authors.join(', ') : 'Author unavailable' }}</span>
+        </span>
         @if (book.id === selectedWorkId()) {
-          <span>Selected</span>
+          <span class="result-list__selected">Selected</span>
         }
-        <p>{{ book.authors.length > 0 ? book.authors.join(', ') : 'Author unavailable' }}</p>
         @if (book.firstPublishedYear !== null || book.editionCount !== null) {
-          <p>
+          <span class="result-list__meta">
             @if (book.firstPublishedYear !== null) {
               <span>First published {{ book.firstPublishedYear }}</span>
+            }
+            @if (book.firstPublishedYear !== null && book.editionCount !== null) {
+              <span aria-hidden="true">/</span>
             }
             @if (book.editionCount !== null) {
               <span>{{ book.editionCount }} editions</span>
             }
-          </p>
+          </span>
         }
       </a>
     </li>

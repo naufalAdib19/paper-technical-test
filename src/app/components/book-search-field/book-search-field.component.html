@@ -1,18 +1,21 @@
-<div>
-  <label for="book-search">Search books</label>
-  <input
-    id="book-search"
-    type="search"
-    [formControl]="control()"
-    [attr.aria-describedby]="isBelowMinimum ? 'search-help' : null"
-    autocomplete="off"
-    placeholder='Try "Octavia Butler" or "climate fiction"'
-  />
-  @if (control().value.length > 0) {
-    <button type="button" (click)="cleared.emit()">Clear search</button>
-  }
+<div class="search-field">
+  <label class="search-field__label" for="book-search">Search books</label>
+  <div class="search-field__control">
+    <input
+      id="book-search"
+      class="search-field__input"
+      type="search"
+      [formControl]="control()"
+      [attr.aria-describedby]="isBelowMinimum ? 'search-help' : null"
+      autocomplete="off"
+      placeholder='Try "Octavia Butler" or "climate fiction"'
+    />
+    @if (control().value.length > 0) {
+      <button class="search-field__clear" type="button" (click)="cleared.emit()">Clear search</button>
+    }
+  </div>
 </div>
 
 @if (isBelowMinimum) {
-  <p id="search-help">Enter at least 3 characters.</p>
+  <p id="search-help" class="search-field__help">Enter at least 3 characters.</p>
 }
