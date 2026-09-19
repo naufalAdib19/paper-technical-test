@@ -4,8 +4,8 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/dashboard/dashboard.component').then(
-        (m) => m.DashboardComponent,
+      import('./pages/book-search/book-search.component').then(
+        (m) => m.BookSearchComponent,
       ),
   },
 ];
