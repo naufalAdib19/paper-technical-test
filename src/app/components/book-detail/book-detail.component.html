@@ -1,0 +1,63 @@
+@let detailState = state();
+@let book = summary();
+
+<section aria-labelledby="book-detail-heading" [attr.aria-busy]="detailState.status === 'loading'">
+  <button class="mobile-back" type="button" (click)="back.emit()">
+    Back to {{ resultCount() }} results
+  </button>
+
+  @if (book) {
+    <app-book-cover [coverId]="book.coverId" size="M" [title]="book.title" [priority]="true" />
+    <h2 id="book-detail-heading" tabindex="-1">{{ book.title }}</h2>
+    <p>{{ book.authors.length > 0 ? book.authors.join(', ') : 'Author unavailable' }}</p>
+
+    @if (book.firstPublishedYear !== null) {
+      <p>First published {{ book.firstPublishedYear }}</p>
+    }
+    @if (book.languages.length > 0) {
+      <p>Languages: {{ book.languages.join(', ') }}</p>
+    }
+    @if (book.editionCount !== null) {
+      <p>{{ book.editionCount }} editions</p>
+    }
+  } @else {
+    <h2 id="book-detail-heading" tabindex="-1">Loading selected work</h2>
+  }
+
+  @if (detailState.status === 'loading') {
+    <p>Loading details for {{ book?.title ?? 'this work' }}.</p>
+  }
+
+  @if (detailState.status === 'success') {
+    <h3>Description</h3>
+    <p>{{ detailState.work.description ?? 'No description is available for this work.' }}</p>
+
+    @if (detailState.work.subjects.length > 0) {
+      <h3>Subjects</h3>
+      <ul id="book-subjects">
+        @for (subject of visibleSubjects; track subject) {
+          <li>{{ subject }}</li>
+        }
+      </ul>
+      @if (detailState.work.subjects.length > 8) {
+        <button
+          type="button"
+          aria-controls="book-subjects"
+          [attr.aria-expanded]="allSubjectsVisible()"
+          (click)="allSubjectsVisible.set(!allSubjectsVisible())"
+        >
+          {{ allSubjectsVisible() ? 'Show fewer subjects' : 'Show all subjects' }}
+        </button>
+      }
+    }
+  }
+
+  @if (detailState.status === 'error') {
+    <p>More details could not be loaded.</p>
+    <button type="button" (click)="retry.emit()">Try again</button>
+  }
+
+  @if (workUrl()) {
+    <a [href]="workUrl()">View on Open Library</a>
+  }
+</section>

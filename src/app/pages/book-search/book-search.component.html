@@ -1,5 +1,7 @@
 <main>
   @let state = searchState();
+  @let detail = detailState();
+  @let hasSelection = selectedWorkId() !== null;
 
   <header>
     <h1>Find the book you meant.</h1>
@@ -24,7 +26,8 @@
     }
   </p>
 
-  <section [attr.aria-busy]="state.status === 'loading'">
+  <div class="search-layout" [class.has-selection]="hasSelection">
+    <section class="results-pane" [attr.aria-busy]="state.status === 'loading'">
     @switch (state.status) {
       @case ('idle') {
         <p>Results appear as you type.</p>
@@ -33,7 +36,12 @@
         <p>Searching the Open Library catalog.</p>
       }
       @case ('success') {
-        <app-book-result-list [result]="state.data" [query]="state.query" />
+        <app-book-result-list
+          [result]="state.data"
+          [query]="state.query"
+          [selectedWorkId]="selectedWorkId()"
+          (selected)="recordResultSelection($event)"
+        />
       }
       @case ('empty') {
         <p>Check the spelling or try a title, author, or broader subject.</p>
@@ -43,5 +51,19 @@
         <button type="button" (click)="retrySearch()">Try again</button>
       }
     }
-  </section>
+    </section>
+
+    @if (hasSelection) {
+      <aside class="detail-pane" aria-label="Selected book details">
+        <app-book-detail
+          [summary]="selectedSummary()"
+          [state]="detail"
+          [workUrl]="workUrl()"
+          [resultCount]="resultCount()"
+          (back)="closeDetail()"
+          (retry)="retryDetail()"
+        />
+      </aside>
+    }
+  </div>
 </main>

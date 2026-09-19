@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { ActivatedRoute, ParamMap, Router, convertToParamMap } from '@angular/router';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { ActivatedRoute, Event as RouterEvent, ParamMap, Router, UrlTree, convertToParamMap } from '@angular/router';
+import { BehaviorSubject, Observable, Subject, of, throwError } from 'rxjs';
 
-import { BookSearchResult } from '../../books/book.models';
+import { BookSearchResult, WorkDetails } from '../../books/book.models';
 import { OpenLibraryService } from '../../books/open-library.service';
 import { BookSearchComponent } from './book-search.component';
 
@@ -26,14 +26,29 @@ describe('BookSearchComponent', () => {
   let fixture: ComponentFixture<BookSearchComponent>;
   let component: BookSearchComponent;
   let routeParams: BehaviorSubject<ParamMap>;
+  let routerEvents: Subject<RouterEvent>;
   let router: jasmine.SpyObj<Router>;
   let books: jasmine.SpyObj<OpenLibraryService>;
 
   beforeEach(async () => {
     routeParams = new BehaviorSubject(convertToParamMap({}));
-    router = jasmine.createSpyObj<Router>('Router', ['navigate']);
+    routerEvents = new Subject<RouterEvent>();
+    router = jasmine.createSpyObj<Router>(
+      'Router',
+      ['navigate', 'createUrlTree', 'serializeUrl'],
+      { events: routerEvents.asObservable() },
+    );
     router.navigate.and.resolveTo(true);
-    books = jasmine.createSpyObj<OpenLibraryService>('OpenLibraryService', ['searchBooks']);
+    router.createUrlTree.and.returnValue({} as UrlTree);
+    router.serializeUrl.and.returnValue('/');
+    books = jasmine.createSpyObj<OpenLibraryService>('OpenLibraryService', [
+      'searchBooks',
+      'getWorkDetails',
+      'getWorkUrl',
+      'getCoverUrl',
+    ]);
+    books.getWorkUrl.and.callFake((workId: string) => `https://openlibrary.org/works/${workId}`);
+    books.getCoverUrl.and.returnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [BookSearchComponent],
@@ -125,11 +140,11 @@ describe('BookSearchComponent', () => {
   it('renders an empty state for a successful search with no books', () => {
     books.searchBooks.and.returnValue(of({ total: 0, books: [] }));
 
-    routeParams.next(convertToParamMap({ q: 'zz' }));
+    routeParams.next(convertToParamMap({ q: 'zzz' }));
     fixture.detectChanges();
 
-    expect(component.searchState()).toEqual({ status: 'empty', query: 'zz' });
-    expect(fixture.nativeElement.textContent).toContain('No books found for "zz"');
+    expect(component.searchState()).toEqual({ status: 'empty', query: 'zzz' });
+    expect(fixture.nativeElement.textContent).toContain('No books found for "zzz"');
   });
 
   it('retries the active query after an error', () => {
@@ -146,5 +161,75 @@ describe('BookSearchComponent', () => {
       query: 'dune',
       data: SEARCH_RESULT,
     });
+  });
+
+  it('loads selected work details from the book query parameter', () => {
+    const work: WorkDetails = {
+      id: 'OL893415W',
+      description: 'A desert world.',
+      subjects: ['Science fiction'],
+    };
+    books.searchBooks.and.returnValue(of(SEARCH_RESULT));
+    books.getWorkDetails.and.returnValue(of(work));
+
+    routeParams.next(convertToParamMap({ q: 'dune', book: 'OL893415W' }));
+    fixture.detectChanges();
+
+    expect(books.getWorkDetails).toHaveBeenCalledWith('OL893415W');
+    expect(component.selectedWorkId()).toBe('OL893415W');
+    expect(component.detailState()).toEqual({ status: 'success', work });
+    expect(fixture.nativeElement.textContent).toContain('A desert world.');
+  });
+
+  it('clears an invalid selection without requesting details', () => {
+    routeParams.next(convertToParamMap({ book: '../unsafe' }));
+
+    expect(books.getWorkDetails).not.toHaveBeenCalled();
+    expect(component.selectedWorkId()).toBeNull();
+    expect(router.navigate).toHaveBeenCalledWith([], {
+      relativeTo: jasmine.anything(),
+      queryParams: { book: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  });
+
+  it('cancels a prior in-flight detail request when selection changes', () => {
+    let wasCancelled = false;
+    books.getWorkDetails.and.callFake(
+      (workId: string) =>
+        new Observable<WorkDetails>(() => {
+          if (workId === 'OL893415W') {
+            return () => {
+              wasCancelled = true;
+            };
+          }
+
+          return undefined;
+        }),
+    );
+
+    routeParams.next(convertToParamMap({ book: 'OL893415W' }));
+    routeParams.next(convertToParamMap({ book: 'OL45804W' }));
+
+    expect(wasCancelled).toBeTrue();
+    expect(component.detailState()).toEqual({ status: 'loading', workId: 'OL45804W' });
+  });
+
+  it('preserves search results when detail loading fails and retries the detail request', () => {
+    books.searchBooks.and.returnValue(of(SEARCH_RESULT));
+    books.getWorkDetails.and.returnValues(
+      throwError(() => new Error('Offline')),
+      of({ id: 'OL893415W', description: null, subjects: [] }),
+    );
+
+    routeParams.next(convertToParamMap({ q: 'dune', book: 'OL893415W' }));
+    expect(component.searchState().status).toBe('success');
+    expect(component.detailState()).toEqual({ status: 'error', workId: 'OL893415W' });
+
+    component.retryDetail();
+
+    expect(books.getWorkDetails).toHaveBeenCalledTimes(2);
+    expect(component.detailState().status).toBe('success');
   });
 });

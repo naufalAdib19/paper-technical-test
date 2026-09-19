@@ -15,6 +15,12 @@ export interface WorkDetails {
   subjects: string[];
 }
 
+export type DetailState =
+  | { status: 'idle' }
+  | { status: 'loading'; workId: string }
+  | { status: 'success'; work: WorkDetails }
+  | { status: 'error'; workId: string };
+
 export interface BookDetails extends BookSummary, WorkDetails {
   openLibraryUrl: string;
 }

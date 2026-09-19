@@ -1,0 +1,9 @@
+.mobile-back {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-back {
+    display: inline-block;
+  }
+}

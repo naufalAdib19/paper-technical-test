@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+
+img,
+div {
+  aspect-ratio: 2 / 3;
+  display: block;
+  inline-size: 100%;
+}
+
+div {
+  align-content: center;
+  background: #e8ecf2;
+  text-align: center;
+}

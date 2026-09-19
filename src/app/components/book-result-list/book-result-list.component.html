@@ -3,18 +3,29 @@
 <ol>
   @for (book of result().books; track book.id) {
     <li>
-      <h3>{{ book.title }}</h3>
-      <p>{{ book.authors.length > 0 ? book.authors.join(', ') : 'Author unavailable' }}</p>
-      @if (book.firstPublishedYear !== null || book.editionCount !== null) {
-        <p>
-          @if (book.firstPublishedYear !== null) {
-            <span>First published {{ book.firstPublishedYear }}</span>
-          }
-          @if (book.editionCount !== null) {
-            <span>{{ book.editionCount }} editions</span>
-          }
-        </p>
-      }
+      <a
+        [id]="'book-result-' + book.id"
+        [routerLink]="[]"
+        [queryParams]="{ q: query(), book: book.id }"
+        [attr.aria-current]="book.id === selectedWorkId() ? 'true' : null"
+        (click)="selected.emit({ workId: book.id, event: $event })"
+      >
+        <h3>{{ book.title }}</h3>
+        @if (book.id === selectedWorkId()) {
+          <span>Selected</span>
+        }
+        <p>{{ book.authors.length > 0 ? book.authors.join(', ') : 'Author unavailable' }}</p>
+        @if (book.firstPublishedYear !== null || book.editionCount !== null) {
+          <p>
+            @if (book.firstPublishedYear !== null) {
+              <span>First published {{ book.firstPublishedYear }}</span>
+            }
+            @if (book.editionCount !== null) {
+              <span>{{ book.editionCount }} editions</span>
+            }
+          </p>
+        }
+      </a>
     </li>
   }
 </ol>

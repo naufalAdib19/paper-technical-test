@@ -1,0 +1,11 @@
+@if (imageSrc() && !imageFailed()) {
+  <img
+    [src]="imageSrc()"
+    [alt]="decorative() ? '' : 'Cover of ' + title()"
+    [attr.loading]="priority() ? 'eager' : 'lazy'"
+    [attr.fetchpriority]="priority() ? 'high' : null"
+    (error)="onImageError()"
+  />
+} @else {
+  <div aria-hidden="true">Cover unavailable</div>
+}

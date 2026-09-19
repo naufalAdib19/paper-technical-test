@@ -1,0 +1,15 @@
+.search-layout.has-selection {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+}
+
+@media (max-width: 767px) {
+  .search-layout.has-selection {
+    display: block;
+  }
+
+  .search-layout.has-selection .results-pane {
+    display: none;
+  }
+}
