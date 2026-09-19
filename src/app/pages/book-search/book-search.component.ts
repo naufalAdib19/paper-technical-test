@@ -30,7 +30,11 @@ type SearchState =
 
 @Component({
   selector: 'app-book-search',
-  imports: [ReactiveFormsModule, BookSearchFieldComponent, BookResultListComponent],
+  imports: [
+    ReactiveFormsModule,
+    BookSearchFieldComponent,
+    BookResultListComponent,
+  ],
   templateUrl: './book-search.component.html',
   styleUrl: './book-search.component.scss',
 })
@@ -92,7 +96,9 @@ export class BookSearchComponent {
       .pipe(
         map(normalizeQuery),
         distinctUntilChanged(),
-        switchMap((query) => (isSearchable(query) ? timer(300).pipe(map(() => query)) : of(query))),
+        switchMap((query) =>
+          isSearchable(query) ? timer(300).pipe(map(() => query)) : of(query),
+        ),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((query) => this.updateQuery(query));
@@ -128,5 +134,5 @@ function normalizeQuery(query: string): string {
 }
 
 function isSearchable(query: string): boolean {
-  return query.length >= 2;
+  return query.length >= 3;
 }
