@@ -2,7 +2,9 @@
   <img
     class="book-cover__image"
     [src]="imageSrc()"
+    [attr.srcset]="detailSrcSet()"
     [alt]="decorative() ? '' : 'Cover of ' + title()"
+    decoding="async"
     [attr.loading]="priority() ? 'eager' : 'lazy'"
     [attr.fetchpriority]="priority() ? 'high' : null"
     (error)="onImageError()"

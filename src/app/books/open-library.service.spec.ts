@@ -112,6 +112,7 @@ describe('OpenLibraryService', () => {
 
   it('builds cover URLs and validates work IDs', () => {
     expect(service.getCoverUrl(12345, 'S')).toBe('https://covers.openlibrary.org/b/id/12345-S.jpg?default=false');
+    expect(service.getCoverUrl(12345, 'L')).toBe('https://covers.openlibrary.org/b/id/12345-L.jpg?default=false');
     expect(service.getCoverUrl(null, 'M')).toBeNull();
     expect(isOpenLibraryWorkId('OL893415W')).toBeTrue();
     expect(isOpenLibraryWorkId('/works/OL893415W')).toBeFalse();

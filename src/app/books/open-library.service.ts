@@ -47,7 +47,7 @@ export class OpenLibraryService {
       .pipe(map((response) => this.mapWorkResponse(workId, response)));
   }
 
-  getCoverUrl(coverId: number | null, size: 'S' | 'M'): string | null {
+  getCoverUrl(coverId: number | null, size: 'S' | 'M' | 'L'): string | null {
     if (coverId === null) {
       return null;
     }
