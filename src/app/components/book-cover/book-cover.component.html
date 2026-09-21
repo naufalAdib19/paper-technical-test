@@ -14,5 +14,13 @@
     />
   </div>
 } @else {
-  <div class="book-cover__placeholder" aria-hidden="true">Cover unavailable</div>
+  <div
+    class="book-cover__placeholder"
+    [class.book-cover__placeholder--decorative]="decorative()"
+    aria-hidden="true"
+  >
+    @if (!decorative()) {
+      Cover unavailable
+    }
+  </div>
 }

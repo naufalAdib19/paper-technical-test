@@ -67,4 +67,14 @@ describe('BookCoverComponent', () => {
     expect(fixture.nativeElement.querySelector('img')).toBeNull();
     expect(fixture.nativeElement.textContent).toContain('Cover unavailable');
   });
+
+  it('renders a text-free placeholder for decorative missing covers', () => {
+    books.getCoverUrl.and.returnValue(null);
+    fixture.componentRef.setInput('decorative', true);
+    fixture.detectChanges();
+
+    const placeholder = fixture.nativeElement.querySelector('.book-cover__placeholder') as HTMLElement;
+    expect(placeholder).not.toBeNull();
+    expect(placeholder.textContent?.trim()).toBe('');
+  });
 });

@@ -41,6 +41,7 @@
 
 .book-cover__placeholder {
   align-content: center;
+  overflow: hidden;
   background: var(--color-surface-soft);
   color: var(--color-text-secondary);
   font-family: var(--font-meta);
@@ -48,6 +49,10 @@
   letter-spacing: 0.06em;
   text-align: center;
   text-transform: uppercase;
+}
+
+.book-cover__placeholder--decorative {
+  color: transparent;
 }
 
 @media (prefers-reduced-motion: no-preference) {

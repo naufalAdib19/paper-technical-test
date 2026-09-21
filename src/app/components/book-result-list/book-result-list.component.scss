@@ -51,6 +51,8 @@
 
 .result-list__cover {
   inline-size: 3rem;
+  min-inline-size: 0;
+  overflow: hidden;
 }
 
 .result-list__primary {
