@@ -1,14 +1,18 @@
 @if (imageSrc() && !imageFailed()) {
-  <img
-    class="book-cover__image"
-    [src]="imageSrc()"
-    [attr.srcset]="detailSrcSet()"
-    [alt]="decorative() ? '' : 'Cover of ' + title()"
-    decoding="async"
-    [attr.loading]="priority() ? 'eager' : 'lazy'"
-    [attr.fetchpriority]="priority() ? 'high' : null"
-    (error)="onImageError()"
-  />
+  <div class="book-cover__frame" [class.book-cover__frame--loaded]="imageLoaded()">
+    <div class="book-cover__loading" aria-hidden="true"></div>
+    <img
+      class="book-cover__image"
+      [src]="imageSrc()"
+      [attr.srcset]="detailSrcSet()"
+      [alt]="decorative() ? '' : 'Cover of ' + title()"
+      decoding="async"
+      [attr.loading]="priority() ? 'eager' : 'lazy'"
+      [attr.fetchpriority]="priority() ? 'high' : null"
+      (load)="onImageLoad()"
+      (error)="onImageError()"
+    />
+  </div>
 } @else {
   <div class="book-cover__placeholder" aria-hidden="true">Cover unavailable</div>
 }

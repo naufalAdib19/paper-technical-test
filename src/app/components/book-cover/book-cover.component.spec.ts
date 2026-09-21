@@ -35,6 +35,12 @@ describe('BookCoverComponent', () => {
     expect(image.getAttribute('srcset')).toContain('12345-M.jpg?default=false 1x');
     expect(image.getAttribute('srcset')).toContain('12345-L.jpg?default=false 2x');
     expect(image.decoding).toBe('async');
+    expect(fixture.nativeElement.querySelector('.book-cover__frame--loaded')).toBeNull();
+
+    image.dispatchEvent(new Event('load'));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.book-cover__frame--loaded')).not.toBeNull();
   });
 
   it('does not request a high-density source set for lazy result covers', () => {
